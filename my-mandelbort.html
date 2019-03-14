@@ -1,0 +1,52 @@
+<script>
+function mandelbort()
+{
+	//迭代算法,z(n+1)=z(n)^2+c,其中z=x+yi,c=a+bi,MandelbortSet是z(0)=0时的迭代集
+	var iterator=function(x,y,a,b)
+	{
+		var i=0,zr,zi;
+		while(++i<eT&&((zr=x*x)+(zi=y*y))<eM)
+		{
+			y=2*x*y+b,x=zr-zi+a;
+		}
+		return i;
+	}
+	//根据逃逸半径简单设置颜色
+	var setColor=function(et)
+	{
+		return 255*(1-et/eT);
+	}
+	//扫描C平面
+	var scanPlane=function()
+	{
+		for(var b=iMax,y=0,i=0;y<height;b-=dI,y++)
+			for(var a=rMin,x=0;x<width;a+=dR,x++,i+=4)
+			{
+				var co=setColor(iterator(zR,zI,a,b));
+				pix[i]=co,pix[i+1]=co,pix[i+2]=co,pix[i+3]=255;
+			}
+	}
+
+	var width=mC.width,height=mC.height;
+	var dmC=mC.getContext('2d');
+	dmC.clearRect(0,0,width,height);
+	var imgd=dmC.getImageData(0,0,width,height);
+	var pix=imgd.data;
+	//Mandelbort集合在复平面[-2.6,1.15,-1.25,1.25]内
+	var rMin=-2.6,rMax=1.15,iMin=-1.25,iMax=1.25,zR=0,zI=0,eM=4,eT=40;
+	//计算画面的单位像素对于的复平面实轴幅度和虚轴幅度	
+	var dR=(rMax-rMin)/width,dI=(iMax-iMin)/height;
+	scanPlane();
+	dmC.putImageData(imgd,0,0);
+}
+function startup()
+{
+	var initComponents=function()
+	{
+		var items="<canvas id=mC width=600 height=400></canvas>";
+		document.body.insertAdjacentHTML('beforeEnd',items);
+	}();
+	mandelbort();
+}
+</script>
+<body onload=startup()></body>
